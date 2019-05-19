@@ -1,0 +1,219 @@
+# -*- conding:utf-8 -*-
+__author__ = "snake"
+
+"""
+    Appium的二次封装
+"""
+
+from appium import webdriver
+from appium.webdriver.common.mobileby import MobileBy
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+
+
+class Config():
+    """
+        AppiumDesktop测试配置文件
+    """
+    LEIDIAN_API_DESIRED_CAPS = {
+        "platformName":'Android', 
+        "platfrmVersion":"5.1.1", 
+        "deviceName":"vivo x6plus", 
+        "appPackage":"io.appium.android.apis", 
+        "appActivity":".ApiDemos", 
+        "automationName": "UIAutomator2",
+        "unicodeKeyboard": True, 
+        "resetKeyboard": True
+    }
+
+    LEIDIAN_ZHIHU_DESIRED_CAPS = {
+        "platformName":'Android', 
+        "platfrmVersion":"5.1.1", 
+        "deviceName":"vivo x6plus", 
+        "appPackage":"com.zhihu.android", 
+        "appActivity":".app.ui.activity.MainActivity", 
+        "automationName": "UIAutomator2",
+        "unicodeKeyboard": True, 
+        "resetKeyboard": True
+    }
+
+    
+    M1NOTE_API_DESIRED_CAPS = {
+        "platformName":'Android', 
+        "platfrmVersion":"5.1", 
+        "deviceName":"m1note", 
+        "appPackage":"io.appium.android.apis", 
+        "appActivity":".ApiDemos", 
+        "automationName": "UIAutomator2",
+        "unicodeKeyboard": True, 
+        "resetKeyboard": True
+    }
+
+    M1NOTE_SCMCC_DESIRED_CAPS = {
+        "platformName":'Android', 
+        "platfrmVersion":"5.1", 
+        "deviceName":"m1note", 
+        "appPackage":"com.sunrise.scmbhc", 
+        "appActivity":".ui.activity.home.HomeActivity", 
+        "automationName": "UIAutomator2",
+        "unicodeKeyboard": True, 
+        "resetKeyboard": True
+    }
+
+class PyAppium():
+    """
+        AppiumDriver二次封装
+    """
+    def __init__(self, url="http://localhost:4723/wd/hub", desired_caps={}, timeout=10):
+        """
+            构造方法
+        """
+        self._driver = webdriver.Remote(url, desired_caps)
+        self._timeout = timeout
+
+    def get_origina_driver(self):
+        """
+            获取appium原始的driver
+        """
+        self._driver.find_element_by_android_uiautomator
+        return self._driver
+
+    def find_element(self, locator):
+        """
+            查找单个元素
+            参数：
+                id: "id"
+                xpath: "xpath"
+                accessibility_id: "aid"
+                android_uiautomator: "aui"
+        """
+        if not isinstance(locator, tuple) or len(locator) != 2:
+            raise Exception("输入的参数必须是(by, value)格式!")
+
+        # 简写
+        if locator[0] == "aid":
+            locator = (MobileBy.ACCESSIBILITY_ID, locator[1])
+        if locator[0] == "aui":
+            locator = (MobileBy.ANDROID_UIAUTOMATOR, locator[1])
+
+        try:
+            return WebDriverWait(self._driver, self._timeout).until(lambda s: s.find_element(*locator))
+        except:
+            print("未找到元素{}!".format(locator))
+            return []
+
+    def find_elements(self, locator):
+        """
+            查找多个元素
+            参数：
+                id: "id"
+                xpath: "xpath"
+                accessibility_id: "aid"
+                android_uiautomator: "aui"
+        """
+        if not isinstance(locator, tuple) or len(locator) != 2:
+            raise Exception("输入的参数必须是(by, value)格式!")
+
+        # 简写
+        if locator[0] == "aid":
+            locator = (MobileBy.ACCESSIBILITY_ID, locator[1])
+        if locator[0] == "aui":
+            locator = (MobileBy.ANDROID_UIAUTOMATOR, locator[1])
+
+        try:
+            return WebDriverWait(self._driver, self._timeout).until(lambda s: s.find_elements(*locator))
+        except:
+            print("未找到元素{}!".format(locator))
+            return []
+
+    def type_zh(self, locator, keywords):
+        """
+            支持中文的输入
+        """
+        e = self.find_element(locator)
+        if isinstance(e, list):
+            raise Exception("未找到locator，请检查传递的参数")
+
+        e.send_keys(keywords)
+
+    def type(self, locator, keywords):
+        """
+            快速的输入，不支持中文
+        """
+        e = self.find_element(locator)
+        if isinstance(e, list):
+            raise Exception("未找到locator，请检查传递的参数")
+
+        self._driver.set_value(e, keywords)
+
+    def click(self, locator):
+        """
+            点击操作
+        """
+        e = self.find_element(locator)
+        if isinstance(e, list):
+            raise Exception("未找到locator，请检查传递的参数")
+
+        e.click()
+
+    def switch_to_alert(self):
+        """
+            appium作用域切换到alert
+        """
+        self._driver.switch_to_alert()
+
+    def switch_to_default_content(self):
+        """
+            appium切换到默认作用域
+        """
+        self._driver.switch_to_default_content()
+
+    def does_exist(self, locator):
+        """
+            动态判断元素是否存在
+                - 元素存在：True
+                - 元素不存在：False
+        """
+        e = self.find_element(locator)
+        if isinstance(e, list):
+            return False
+        else:
+            return True
+            
+    def does_toast_exist(self, text=None):
+        """
+            根据toast文本判断toast是否存在
+                - 存在返回：元素, True
+                - 不存在返回：None, False
+            注意: 此方法需要指定启动参数 "automationName": "UIAutomator2" !
+        """
+        try:
+            toast_loc = ("xpath", ".//*[contains(@text,'{}')]".format(text))
+            e = WebDriverWait(self._driver, self._timeout).until(EC.presence_of_element_located(toast_loc))
+            return e, True
+        except:
+            return None, False
+
+
+if __name__ == "__main__":
+    pyappium = PyAppium(desired_caps=Config.M1NOTE_API_DESIRED_CAPS)
+
+    # locator = ("id", "android:id/text1") 
+    # locator = ("xpath", '//android.widget.TextView[@content-desc="Accessibility"]')
+    # locator = ("accessibility id", "Accessibility")
+    # locator = ("-android uiautomator", 'new UiSelector().text("Accessibility")')
+    # pyappium.find_element(locator).click()
+
+    app = ("aid", "App")
+    app_search = ("aid", "Search")
+    app_search_invoke = ("aid", "Invoke Search")
+    app_search_invoke_appdata = ("id", "io.appium.android.apis:id/txt_query_appdata")
+
+    pyappium.click(app)
+    pyappium.click(app_search)
+    pyappium.click(app_search_invoke)
+    pyappium.type(app_search_invoke_appdata, "hello appium!")
+    pyappium.type_zh(app_search_invoke_appdata, "hello appium!")
+
+    # print(pyappium.does_exist(app))
