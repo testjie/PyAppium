@@ -76,7 +76,6 @@ class PyAppium():
         """
             获取appium原始的driver
         """
-        self._driver.find_element_by_android_uiautomator
         return self._driver
 
     def find_element(self, locator):
@@ -100,8 +99,7 @@ class PyAppium():
         try:
             return WebDriverWait(self._driver, self._timeout).until(lambda s: s.find_element(*locator))
         except:
-            print("未找到元素{}!".format(locator))
-            return []
+            raise Exception("未找到元素{}!".format(locator))
 
     def find_elements(self, locator):
         """
@@ -124,38 +122,25 @@ class PyAppium():
         try:
             return WebDriverWait(self._driver, self._timeout).until(lambda s: s.find_elements(*locator))
         except:
-            print("未找到元素{}!".format(locator))
-            return []
+            raise Exception("未找到元素{}!".format(locator))
 
     def type_zh(self, locator, keywords):
         """
             支持中文的输入
         """
-        e = self.find_element(locator)
-        if isinstance(e, list):
-            raise Exception("未找到locator，请检查传递的参数")
-
-        e.send_keys(keywords)
+        self.find_element(locator).send_keys(keywords)
 
     def type(self, locator, keywords):
         """
             快速的输入，不支持中文
         """
-        e = self.find_element(locator)
-        if isinstance(e, list):
-            raise Exception("未找到locator，请检查传递的参数")
-
-        self._driver.set_value(e, keywords)
+        self._driver.set_value(self.find_element(locator), keywords)
 
     def click(self, locator):
         """
             点击操作
         """
-        e = self.find_element(locator)
-        if isinstance(e, list):
-            raise Exception("未找到locator，请检查传递的参数")
-
-        e.click()
+        self.find_element(locator).click()
 
     def switch_to_alert(self):
         """
@@ -175,11 +160,11 @@ class PyAppium():
                 - 元素存在：True
                 - 元素不存在：False
         """
-        e = self.find_element(locator)
-        if isinstance(e, list):
-            return False
-        else:
+        try:
+            e = self.find_element(locator)
             return True
+        except:
+            return False
             
     def does_toast_exist(self, text=None):
         """
@@ -190,7 +175,7 @@ class PyAppium():
         """
         try:
             toast_loc = ("xpath", ".//*[contains(@text,'{}')]".format(text))
-            e = WebDriverWait(self._driver, self._timeout).until(EC.presence_of_element_located(toast_loc))
+            e = self.find_element(toast_loc)
             return e, True
         except:
             return None, False
