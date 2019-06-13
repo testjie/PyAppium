@@ -18,7 +18,7 @@ class Config():
     """
     LEIDIAN_API_DESIRED_CAPS = {
         "platformName":'Android', 
-        "platfrmVersion":"5.1.1", 
+        "platformVersion":"5.1.1", 
         "deviceName":"vivo x6plus", 
         "appPackage":"io.appium.android.apis", 
         "appActivity":".ApiDemos", 
@@ -29,7 +29,7 @@ class Config():
 
     LEIDIAN_ZHIHU_DESIRED_CAPS = {
         "platformName":'Android', 
-        "platfrmVersion":"5.1.1", 
+        "platformVersion":"5.1.1", 
         "deviceName":"vivo x6plus", 
         "appPackage":"com.zhihu.android", 
         "appActivity":".app.ui.activity.MainActivity", 
@@ -41,7 +41,7 @@ class Config():
     
     M1NOTE_API_DESIRED_CAPS = {
         "platformName":'Android', 
-        "platfrmVersion":"5.1", 
+        "platformVersion":"5.1", 
         "deviceName":"m1note", 
         "appPackage":"io.appium.android.apis", 
         "appActivity":".ApiDemos", 
@@ -52,7 +52,7 @@ class Config():
 
     M1NOTE_SCMCC_DESIRED_CAPS = {
         "platformName":'Android', 
-        "platfrmVersion":"5.1", 
+        "platformVersion":"5.1", 
         "deviceName":"m1note", 
         "appPackage":"com.sunrise.scmbhc", 
         "appActivity":".ui.activity.home.HomeActivity", 
