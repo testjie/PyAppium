@@ -29,7 +29,7 @@ class Config():
 
     LEIDIAN_ZHIHU_DESIRED_CAPS = {
         "platformName":'Android', 
-        "platformVersion":"5.1.1", 
+        "platfrmVersion":"5.1.1", 
         "deviceName":"vivo x6plus", 
         "appPackage":"com.zhihu.android", 
         "appActivity":".app.ui.activity.MainActivity", 
@@ -41,7 +41,7 @@ class Config():
     
     M1NOTE_API_DESIRED_CAPS = {
         "platformName":'Android', 
-        "platformVersion":"5.1", 
+        "platfrmVersion":"5.1", 
         "deviceName":"m1note", 
         "appPackage":"io.appium.android.apis", 
         "appActivity":".ApiDemos", 
@@ -52,7 +52,7 @@ class Config():
 
     M1NOTE_SCMCC_DESIRED_CAPS = {
         "platformName":'Android', 
-        "platformVersion":"5.1", 
+        "platfrmVersion":"5.1", 
         "deviceName":"m1note", 
         "appPackage":"com.sunrise.scmbhc", 
         "appActivity":".ui.activity.home.HomeActivity", 
@@ -161,7 +161,7 @@ class PyAppium():
                 - 元素不存在：False
         """
         try:
-            e = self.find_element(locator)
+            self.find_element(locator)
             return True
         except:
             return False
@@ -182,14 +182,26 @@ class PyAppium():
 
 
 if __name__ == "__main__":
+    # desired_caps = {}
+    # desired_caps['platformName'] = 'Android'                    # 打开什么平台的app，固定的 > 启动安卓平台
+    # desired_caps['platformVersion'] = '5.1.1'                   # 安卓系统的版本号：adb shell getprop ro.build.version.release
+    # desired_caps['deviceName'] = 'vivo x6plus d'                # 手机/模拟器的型号：adb shell getprop ro.product.model
+    # desired_caps['appPackage'] = 'io.appium.android.apis'       # app的名字：adb shell dumpsys activity | findstr "mFocusedActivity"
+    # desired_caps['appActivity'] = '.ApiDemos'                   # app的启动页名字：adb shell dumpsys activity | findstr "mFocusedActivity"
+    # desired_caps['unicodeKeyboard'] = True                      # 为了支持中文
+    # desired_caps['resetKeyboard'] = True                        # 设置成appium自带的键盘
+    # pyappium = PyAppium(desired_caps=desired_caps)
+
     pyappium = PyAppium(desired_caps=Config.M1NOTE_API_DESIRED_CAPS)
 
+    # 1. 查找元素的用法
     # locator = ("id", "android:id/text1") 
     # locator = ("xpath", '//android.widget.TextView[@content-desc="Accessibility"]')
-    # locator = ("accessibility id", "Accessibility")
-    # locator = ("-android uiautomator", 'new UiSelector().text("Accessibility")')
+    # locator = ("aid", "Accessibility")
+    # locator = ("aui", 'new UiSelector().text("Accessibility")')
     # pyappium.find_element(locator).click()
 
+    # 2. 操作元素
     app = ("aid", "App")
     app_search = ("aid", "Search")
     app_search_invoke = ("aid", "Invoke Search")
@@ -201,4 +213,4 @@ if __name__ == "__main__":
     pyappium.type(app_search_invoke_appdata, "hello appium!")
     pyappium.type_zh(app_search_invoke_appdata, "hello appium!")
 
-    # print(pyappium.does_exist(app))
+    print(pyappium.does_exist(app))
